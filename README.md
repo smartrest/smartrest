@@ -1,2 +1,2 @@
-# smartrest
-Easy library for micro services!
+# SmartREST
+Easy library for REST fast micro services build on JDK 11
