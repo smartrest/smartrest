@@ -22,6 +22,10 @@ public class TestService extends RestHandler {
 		System.out.println("Parametro passato: " + aName);
 		System.out.println("Parametro passato: " + aSecondName);
 		System.out.println("Parametro passato: " + bodyparm);
+		
+		
+		
+		
 		return "Hello " + aName + " " + aSecondName;
 	}
 	

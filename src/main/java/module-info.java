@@ -3,5 +3,7 @@ module smartrest {
 	exports it.smartrest.annotations;
 	exports it.smartrest.core;
 	exports it.smartrest.utils;
+	exports it.smartrest.responses;
+	
 	requires jdk.httpserver;
 }
