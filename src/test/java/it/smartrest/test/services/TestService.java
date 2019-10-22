@@ -2,6 +2,7 @@ package it.smartrest.test.services;
 
 import it.smartrest.annotations.Body;
 import it.smartrest.annotations.GET;
+import it.smartrest.annotations.PUT;
 import it.smartrest.annotations.NotNull;
 import it.smartrest.annotations.POST;
 import it.smartrest.annotations.Query;
@@ -29,4 +30,10 @@ public class TestService extends RestHandler {
 		return "Hello " + aName + " " + aSecondName;
 	}
 	
+	@PUT
+	public String method3() {
+		return "Invocato il metodo3 ";
+	}
+	
 }
+

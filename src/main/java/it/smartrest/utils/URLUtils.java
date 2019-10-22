@@ -23,12 +23,14 @@ public class URLUtils {
 
 	public static HashMap<String, Object> findParameters(String aQuery) {
 		HashMap<String, Object> params = new HashMap<String, Object>();
-		try {
-			Arrays.asList(aQuery.split("&")).forEach(p -> {
-				params.put(p.split("=")[0], p.split("=")[1]);
-			});
-		} catch (Exception e) {
-			e.printStackTrace();
+		if(aQuery !=null) {
+			try {
+				Arrays.asList(aQuery.split("&")).forEach(p -> {
+					params.put(p.split("=")[0], p.split("=")[1]);
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		return params;
 	}
