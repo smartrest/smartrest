@@ -1,7 +1,6 @@
 package it.smartrest.test.responses;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 import it.smartrest.responses.JSONReponse;
 
@@ -10,8 +9,12 @@ public class TestJSONResponses {
 		TestObject o = new TestObject();
 		o.setCognome(null);
 		o.setNome("David");
-		o.setEta(new BigDecimal("36"));
-		
+		o.setEta(new BigDecimal("37"));
+		TestObject2 firenze = new TestObject2();
+		firenze.setCode("D612");
+		firenze.setDescription("Firenze");
+		o.setLuogoNascita(firenze);
+		o.setPeso(new Double(123.4));
 		JSONReponse r = new JSONReponse(o);
 		r.getResponse();
 	}

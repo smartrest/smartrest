@@ -95,7 +95,7 @@ public class RestHandler implements HttpHandler {
 	 * @return Ordered list of method parameter
 	 */
 	private Object[] buildParameterFromAnnotation(Annotation aAnnotation[][], HashMap<String, Object> aUrlParameter) {
-		ArrayList<Object[]> ordParm = new ArrayList<Object[]>();
+		ArrayList<Object[]> orderedParams = new ArrayList<Object[]>();
 		// loop the parameter annotation to find the values in the map of sended
 		// parameter
 		for (Iterator<Annotation[]> iterator = Arrays.asList(aAnnotation).iterator(); iterator.hasNext();) {
@@ -110,20 +110,20 @@ public class RestHandler implements HttpHandler {
 			}
 
 			for (Iterator<Annotation> iterator2 = Arrays.asList(annotation).iterator(); iterator2.hasNext();) {
-				Annotation anno = iterator2.next();
+				Annotation a = iterator2.next();
 				// Check if present Query parameter
-				if (anno.annotationType().equals(Query.class)) {
-					if (aUrlParameter.containsKey(((Query) anno).value())) {
-						Object p[] = { ((Query) anno).value(), aUrlParameter.get(((Query) anno).value()) };
-						ordParm.add(p);
+				if (a.annotationType().equals(Query.class)) {
+					if (aUrlParameter.containsKey(((Query) a).value())) {
+						Object p[] = { ((Query) a).value(), aUrlParameter.get(((Query) a).value()) };
+						orderedParams.add(p);
 						found = true;
 					}
 				}
 				// Check if present Body parameter
-				if (anno.annotationType().equals(Body.class)) {
-					if (aUrlParameter.containsKey(((Body) anno).value())) {
-						Object p[] = { ((Body) anno).value(), aUrlParameter.get(((Body) anno).value()) };
-						ordParm.add(p);
+				if (a.annotationType().equals(Body.class)) {
+					if (aUrlParameter.containsKey(((Body) a).value())) {
+						Object p[] = { ((Body) a).value(), aUrlParameter.get(((Body) a).value()) };
+						orderedParams.add(p);
 						found = true;
 					}
 				}
@@ -131,14 +131,14 @@ public class RestHandler implements HttpHandler {
 
 			if (!found && !notnull) {
 				Object p[] = { "notfoundparam", null };
-				ordParm.add(p);
+				orderedParams.add(p);
 			}
 
 		}
 
-		Object[] p = new Object[ordParm.size()];
-		for (int i = 0; i < ordParm.size(); i++)
-			p[i] = ordParm.get(i)[1];
+		Object[] p = new Object[orderedParams.size()];
+		for (int i = 0; i < orderedParams.size(); i++)
+			p[i] = orderedParams.get(i)[1];
 
 		return p;
 	}

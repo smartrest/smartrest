@@ -8,6 +8,15 @@ import java.util.HashMap;
 
 public class JSONReponse {
 
+	private final static String _METHOD_PREFIX = "get";
+	private final static String _STRING_END = ",";
+	private final static char _VALUE_SEPARATOR = ':';
+	private final static char _OPEN_BRACE = '{';
+	private final static char _CLOSE_BRACE = '}';
+	private final static char _STRING_MARKS = '"';
+	private final static char _OPEN_BRACKETS = '[';
+	private final static char _CLOSE_BRACKETS = ']';
+
 	private Object obj;
 
 	public JSONReponse(Object obj) {
@@ -15,31 +24,62 @@ public class JSONReponse {
 	}
 
 	public void getResponse() {
-		HashMap<String, Field> map = new HashMap<String, Field>();
-		Arrays.asList(this.obj.getClass().getDeclaredFields()).forEach(f -> {
-			map.put(f.getName().toUpperCase(), f);
+		StringBuilder json = new StringBuilder();
+		json.append(_OPEN_BRACE);
+		json.append(buildJsonString(this.obj));
+		json.append(_CLOSE_BRACE);
+		System.out.println(json.toString());
+	}
+
+	private StringBuilder buildJsonString(Object aObject) {
+		StringBuilder json = new StringBuilder();
+		// From the object get the map of fields
+		HashMap<String, Field> fieldsMap = new HashMap<String, Field>();
+		Arrays.asList(aObject.getClass().getDeclaredFields()).forEach(f -> {
+			fieldsMap.put(f.getName().toUpperCase(), f);
 		});
-		System.out.println("{");
-		for (Method m : this.obj.getClass().getMethods()) {
+
+		/// for every object method
+		for (Method m : aObject.getClass().getMethods()) {
 			try {
-				if (map.containsKey(m.getName().replaceFirst("get", "").toUpperCase())) {
-					Object o = m.invoke(this.obj);
-					if(o!=null) {
-						if( map.get(m.getName().replaceFirst("get", "").toUpperCase()).getType().equals(String.class)) {
-							System.out.println("\""+map.get(m.getName().replaceFirst("get", "").toUpperCase()).getName()+"\":\""+ o.toString()+"\",");
-							
+				// check for only method get of field
+				if (fieldsMap.containsKey(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())) {
+					Object o = m.invoke(aObject);
+					if (o != null) {
+						if (fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase()).getType()
+								.equals(String.class)) {
+							json.append(_STRING_MARKS
+									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
+											.getName()
+									+ _STRING_MARKS + _VALUE_SEPARATOR + _STRING_MARKS + o.toString() + _STRING_MARKS
+									+ _STRING_END);
+						} else if (fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase()).getType()
+								.equals(BigDecimal.class)) {
+							json.append(_STRING_MARKS
+									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
+											.getName()
+									+ _STRING_MARKS + _VALUE_SEPARATOR + (((BigDecimal) o).toPlainString())
+									+ _STRING_END);
+						} else if (fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase()).getType()
+								.equals(Double.class)) {
+							json.append(_STRING_MARKS
+									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
+											.getName()
+									+ _STRING_MARKS + _VALUE_SEPARATOR + (((Double) o).doubleValue()) + _STRING_END);
+						} else {
+							json.append(_STRING_MARKS
+									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
+											.getName()
+									+ _STRING_MARKS + _VALUE_SEPARATOR + _OPEN_BRACE + buildJsonString(o) + _CLOSE_BRACE
+									+ _STRING_END);
 						}
-						if( map.get(m.getName().replaceFirst("get", "").toUpperCase()).getType().equals(BigDecimal.class)) {
-							System.out.println("\""+map.get(m.getName().replaceFirst("get", "").toUpperCase()).getName()+"\":"+ (((BigDecimal)o).toPlainString())+",");
-						}
+
 					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("}");
-		
-
+		return json.replace(json.lastIndexOf(_STRING_END), json.lastIndexOf(_STRING_END) + 1, "");
 	}
 }

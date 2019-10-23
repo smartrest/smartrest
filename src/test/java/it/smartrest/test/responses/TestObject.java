@@ -11,6 +11,8 @@ public class TestObject implements Serializable {
 	private String nome;
 	private String cognome;
 	private BigDecimal eta;
+	private TestObject2 luogoNascita;
+	private Double peso;
 	
 	public String getNome() {
 		return nome;
@@ -29,6 +31,18 @@ public class TestObject implements Serializable {
 	}
 	public void setEta(BigDecimal eta) {
 		this.eta = eta;
+	}
+	public TestObject2 getLuogoNascita() {
+		return luogoNascita;
+	}
+	public void setLuogoNascita(TestObject2 luogoNascita) {
+		this.luogoNascita = luogoNascita;
+	}
+	public Double getPeso() {
+		return peso;
+	}
+	public void setPeso(Double peso) {
+		this.peso = peso;
 	}
 	
 	
