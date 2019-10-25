@@ -3,6 +3,9 @@ package it.smartrest.test.responses;
 public class TestObject2 {
 	private String code;
 	private String description;
+	private Character attivo;
+	
+	
 	public String getCode() {
 		return code;
 	}
@@ -14,5 +17,11 @@ public class TestObject2 {
 	}
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	public Character getAttivo() {
+		return attivo;
+	}
+	public void setAttivo(Character attivo) {
+		this.attivo = attivo;
 	}
 }

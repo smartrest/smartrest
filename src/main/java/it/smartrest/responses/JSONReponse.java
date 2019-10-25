@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class JSONReponse {
 
@@ -40,12 +41,19 @@ public class JSONReponse {
 			fieldsMap.put(f.getName().toUpperCase(), f);
 		});
 
+//		for (Iterator<String> iterator = fieldsMap.keySet().iterator(); iterator.hasNext();) {
+//			String type = iterator.next();
+//			System.out.println(type);
+//		}
+
 		/// for every object method
 		for (Method m : aObject.getClass().getMethods()) {
 			try {
 				// check for only method get of field
 				if (fieldsMap.containsKey(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())) {
+//					System.out.println(m.getName());
 					Object o = m.invoke(aObject);
+//					System.out.println(o.getClass());
 					if (o != null) {
 						if (o.getClass().equals(java.lang.String.class)) {
 							json.append(_STRING_MARKS
@@ -76,8 +84,23 @@ public class JSONReponse {
 							json.append(_STRING_MARKS
 									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
 											.getName()
-									+ _STRING_MARKS + _VALUE_SEPARATOR + df.format(((java.util.Date) o)) + _STRING_END);
-						} else {
+									+ _STRING_MARKS + _VALUE_SEPARATOR + _STRING_MARKS + df.format(((java.util.Date) o))
+									+ _STRING_MARKS + _STRING_END);
+						} else if (o.getClass().equals(java.lang.Character.class)) {
+							json.append(_STRING_MARKS
+									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
+											.getName()
+									+ _STRING_MARKS + _VALUE_SEPARATOR + _STRING_MARKS
+									+ (((java.lang.Character) o).charValue()) + _STRING_MARKS + _STRING_END);
+						} else if (o.getClass().equals(java.lang.Boolean.class)) {
+							json.append(_STRING_MARKS
+									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
+											.getName()
+									+ _STRING_MARKS + _VALUE_SEPARATOR + _STRING_MARKS
+									+ (((java.lang.Boolean) o).toString()) + _STRING_MARKS + _STRING_END);
+						}
+
+						else {
 							json.append(_STRING_MARKS
 									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
 											.getName()

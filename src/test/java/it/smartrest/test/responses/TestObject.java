@@ -16,6 +16,7 @@ public class TestObject implements Serializable {
 	private Double peso;
 	private Date dataNascita;
 	private int primitiva;
+	private Boolean padre;
 	
 	public String getNome() {
 		return nome;
@@ -58,6 +59,12 @@ public class TestObject implements Serializable {
 	}
 	public void setDataNascita(Date dataNascita) {
 		this.dataNascita = dataNascita;
+	}
+	public boolean getPadre() {
+		return padre;
+	}
+	public void setPadre(boolean padre) {
+		this.padre = padre;
 	}
 	
 	
