@@ -1,6 +1,6 @@
 package it.smartrest.test.responses;
 
-public class TestObject2 {
+public class City {
 	private String code;
 	private String description;
 	private Character attivo;

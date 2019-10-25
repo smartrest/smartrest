@@ -55,58 +55,63 @@ public class JSONReponse {
 					Object o = m.invoke(aObject);
 //					System.out.println(o.getClass());
 					if (o != null) {
-						if (o.getClass().equals(java.lang.String.class)) {
-							json.append(_STRING_MARKS
-									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
-											.getName()
-									+ _STRING_MARKS + _VALUE_SEPARATOR + _STRING_MARKS + o.toString() + _STRING_MARKS
-									+ _STRING_END);
-						} else if (o.getClass().equals(java.math.BigDecimal.class)) {
-							json.append(_STRING_MARKS
-									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
-											.getName()
-									+ _STRING_MARKS + _VALUE_SEPARATOR + (((java.math.BigDecimal) o).toPlainString())
-									+ _STRING_END);
-						} else if (o.getClass().equals(java.lang.Double.class)) {
-							json.append(_STRING_MARKS
-									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
-											.getName()
-									+ _STRING_MARKS + _VALUE_SEPARATOR + (((java.lang.Double) o).doubleValue())
-									+ _STRING_END);
-						} else if (o.getClass().equals(java.lang.Integer.class)) {
-							json.append(_STRING_MARKS
-									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
-											.getName()
-									+ _STRING_MARKS + _VALUE_SEPARATOR + (((java.lang.Integer) o).intValue())
-									+ _STRING_END);
-						} else if (o.getClass().equals(java.util.Date.class)) {
-							DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm a z");
-							json.append(_STRING_MARKS
-									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
-											.getName()
-									+ _STRING_MARKS + _VALUE_SEPARATOR + _STRING_MARKS + df.format(((java.util.Date) o))
-									+ _STRING_MARKS + _STRING_END);
-						} else if (o.getClass().equals(java.lang.Character.class)) {
-							json.append(_STRING_MARKS
-									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
-											.getName()
-									+ _STRING_MARKS + _VALUE_SEPARATOR + _STRING_MARKS
-									+ (((java.lang.Character) o).charValue()) + _STRING_MARKS + _STRING_END);
-						} else if (o.getClass().equals(java.lang.Boolean.class)) {
-							json.append(_STRING_MARKS
-									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
-											.getName()
-									+ _STRING_MARKS + _VALUE_SEPARATOR + _STRING_MARKS
-									+ (((java.lang.Boolean) o).toString()) + _STRING_MARKS + _STRING_END);
+						appendInit(json,
+								fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase()).getName());
+						
+						if(!writeBasicTypeData(json,o)) {
+							// Arrays of know types
+							if (o instanceof java.lang.Object[]) {
+								json.append(_OPEN_BRACKETS);
+								boolean found = false;
+								for (int i = 0; i < ((java.lang.Object[]) o).length; i++) {
+									if (((java.lang.Object[]) o)[i] != null) {
+										found = writeBasicTypeData(json,((java.lang.Object[]) o)[i]);
+										if (i + 1 < ((java.lang.Object[]) o).length&&found)
+											json.append(_STRING_END);
+									}
+								}  
+								if(!found) {
+									for (int i = 0; i < ((java.lang.Object[]) o).length; i++) {
+										if (((java.lang.Object[]) o)[i] != null) {
+											json.append(_OPEN_BRACE).append(buildJsonString(((java.lang.Object[]) o)[i])).append(_CLOSE_BRACE);
+											if (i + 1 < ((java.lang.Object[]) o).length)
+												json.append(_STRING_END);
+										}
+									}
+								}
+								
+								json.append(_CLOSE_BRACKETS);
+							} else if (o instanceof java.util.List) {
+								
+								json.append(_OPEN_BRACKETS);
+								boolean found = false;
+								for (int i = 0; i < ((java.util.List) o).size(); i++) {
+									if ( ((java.util.List) o).get(i) != null) {
+										found = writeBasicTypeData(json,((java.util.List) o).get(i));
+										if (i + 1 < ((java.util.List) o).size()&&found)
+											json.append(_STRING_END);
+									}
+								}  
+								if(!found) {
+									for (int i = 0; i < ((java.util.List) o).size(); i++) {
+										if (((java.util.List) o).get(i) != null) {
+											json.append(_OPEN_BRACE).append(buildJsonString(((java.util.List) o).get(i))).append(_CLOSE_BRACE);
+											if (i + 1 < ((java.util.List) o).size())
+												json.append(_STRING_END);
+										}
+									}
+								}
+								
+								json.append(_CLOSE_BRACKETS);
+								
+							}
+							// other object
+							else {
+								json.append(_OPEN_BRACE).append(buildJsonString(o)).append(_CLOSE_BRACE);
+							}
 						}
+						appendEnd(json);
 
-						else {
-							json.append(_STRING_MARKS
-									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
-											.getName()
-									+ _STRING_MARKS + _VALUE_SEPARATOR + _OPEN_BRACE + buildJsonString(o) + _CLOSE_BRACE
-									+ _STRING_END);
-						}
 					}
 				}
 			} catch (Exception e) {
@@ -115,4 +120,64 @@ public class JSONReponse {
 		}
 		return json.replace(json.lastIndexOf(_STRING_END), json.lastIndexOf(_STRING_END) + 1, "");
 	}
+
+	private synchronized void appendInit(StringBuilder buffer, String aName) {
+		buffer.append(_STRING_MARKS + aName + _STRING_MARKS + _VALUE_SEPARATOR);
+	}
+
+	private synchronized void appendEnd(StringBuilder buffer) {
+		buffer.append(_STRING_END);
+	}
+
+	private synchronized void writeStringData(StringBuilder json, String data) {
+		json.append(_STRING_MARKS + data + _STRING_MARKS);
+	}
+
+	private synchronized void writeCharData(StringBuilder json, Character data) {
+		json.append(_STRING_MARKS + data.toString() + _STRING_MARKS);
+	}
+
+	private synchronized void writeDateData(StringBuilder json, java.util.Date data) {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm a z");
+		writeStringData(json, df.format((data)));
+	}
+	
+	private synchronized boolean writeBasicTypeData(StringBuilder json, java.lang.Object o) {
+		boolean found=false;
+		if (o instanceof java.lang.String) {
+			writeStringData(json, o.toString());
+			found=true;
+		} else if (o instanceof java.math.BigDecimal) {
+			json.append((((java.math.BigDecimal) o).toPlainString()));
+			found=true;
+		} else if (o instanceof java.lang.Double) {
+			json.append((((java.lang.Double) o).doubleValue()));
+			found=true;
+		} else if (o instanceof java.lang.Integer) {
+			json.append((((java.lang.Integer) o).intValue()));
+			found=true;
+		} else if (o instanceof java.util.Date) {
+			writeDateData(json, (java.util.Date) o);
+			found=true;
+		} else if (o instanceof java.lang.Character) {
+			writeCharData(json, (((java.lang.Character) o).charValue()));
+			found=true;
+		} else if (o instanceof java.lang.Boolean) {
+			json.append((((java.lang.Boolean) o).toString()));
+			found=true;
+		} else if (o instanceof java.lang.Float) {
+			json.append((((java.lang.Float) o).floatValue()));
+			found=true;
+		} else if (o instanceof java.lang.Long) {
+			json.append((((java.lang.Long) o).floatValue()));
+			found=true;
+		}
+		return found;
+	}
+	
+	
+	
+	
+	
+	
 }

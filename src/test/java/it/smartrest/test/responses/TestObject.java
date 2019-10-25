@@ -3,6 +3,7 @@ package it.smartrest.test.responses;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class TestObject implements Serializable {
 	/**
@@ -12,11 +13,18 @@ public class TestObject implements Serializable {
 	private String nome;
 	private String cognome;
 	private BigDecimal eta;
-	private TestObject2 luogoNascita;
+	private City luogoNascita;
 	private Double peso;
 	private Date dataNascita;
 	private int primitiva;
-	private Boolean padre;
+	private boolean padre;
+	private String[] interests;
+	private BigDecimal[] assets;
+	private City[] livedCity;
+	
+	private List<String> skills;
+	private List<City> lovedCity;
+	
 	
 	public String getNome() {
 		return nome;
@@ -36,10 +44,10 @@ public class TestObject implements Serializable {
 	public void setEta(BigDecimal eta) {
 		this.eta = eta;
 	}
-	public TestObject2 getLuogoNascita() {
+	public City getLuogoNascita() {
 		return luogoNascita;
 	}
-	public void setLuogoNascita(TestObject2 luogoNascita) {
+	public void setLuogoNascita(City luogoNascita) {
 		this.luogoNascita = luogoNascita;
 	}
 	public Double getPeso() {
@@ -65,6 +73,36 @@ public class TestObject implements Serializable {
 	}
 	public void setPadre(boolean padre) {
 		this.padre = padre;
+	}
+	public String[] getInterests() {
+		return interests;
+	}
+	public void setInterests(String[] interests) {
+		this.interests = interests;
+	}
+	public BigDecimal[] getAssets() {
+		return assets;
+	}
+	public void setAssets(BigDecimal[] assets) {
+		this.assets = assets;
+	}
+	public City[] getLivedCity() {
+		return livedCity;
+	}
+	public void setLivedCity(City[] livedCity) {
+		this.livedCity = livedCity;
+	}
+	public List<String> getSkills() {
+		return skills;
+	}
+	public void setSkills(List<String> skills) {
+		this.skills = skills;
+	}
+	public List<City> getLovedCity() {
+		return lovedCity;
+	}
+	public void setLovedCity(List<City> lovedCity) {
+		this.lovedCity = lovedCity;
 	}
 	
 	
