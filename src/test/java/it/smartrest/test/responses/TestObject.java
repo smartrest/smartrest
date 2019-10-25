@@ -2,6 +2,7 @@ package it.smartrest.test.responses;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class TestObject implements Serializable {
 	/**
@@ -13,6 +14,8 @@ public class TestObject implements Serializable {
 	private BigDecimal eta;
 	private TestObject2 luogoNascita;
 	private Double peso;
+	private Date dataNascita;
+	private int primitiva;
 	
 	public String getNome() {
 		return nome;
@@ -43,6 +46,18 @@ public class TestObject implements Serializable {
 	}
 	public void setPeso(Double peso) {
 		this.peso = peso;
+	}
+	public int getPrimitiva() {
+		return primitiva;
+	}
+	public void setPrimitiva(int primitiva) {
+		this.primitiva = primitiva;
+	}
+	public Date getDataNascita() {
+		return dataNascita;
+	}
+	public void setDataNascita(Date dataNascita) {
+		this.dataNascita = dataNascita;
 	}
 	
 	

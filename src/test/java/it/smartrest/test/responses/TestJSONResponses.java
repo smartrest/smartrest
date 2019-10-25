@@ -1,6 +1,7 @@
 package it.smartrest.test.responses;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import it.smartrest.responses.JSONReponse;
 
@@ -15,6 +16,9 @@ public class TestJSONResponses {
 		firenze.setDescription("Firenze");
 		o.setLuogoNascita(firenze);
 		o.setPeso(new Double(123.4));
+		o.setPrimitiva(10);
+		o.setDataNascita(new Date());
+		
 		JSONReponse r = new JSONReponse(o);
 		r.getResponse();
 	}

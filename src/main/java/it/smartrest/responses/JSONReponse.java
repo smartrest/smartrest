@@ -2,7 +2,8 @@ package it.smartrest.responses;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -46,26 +47,36 @@ public class JSONReponse {
 				if (fieldsMap.containsKey(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())) {
 					Object o = m.invoke(aObject);
 					if (o != null) {
-						if (fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase()).getType()
-								.equals(String.class)) {
+						if (o.getClass().equals(java.lang.String.class)) {
 							json.append(_STRING_MARKS
 									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
 											.getName()
 									+ _STRING_MARKS + _VALUE_SEPARATOR + _STRING_MARKS + o.toString() + _STRING_MARKS
 									+ _STRING_END);
-						} else if (fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase()).getType()
-								.equals(BigDecimal.class)) {
+						} else if (o.getClass().equals(java.math.BigDecimal.class)) {
 							json.append(_STRING_MARKS
 									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
 											.getName()
-									+ _STRING_MARKS + _VALUE_SEPARATOR + (((BigDecimal) o).toPlainString())
+									+ _STRING_MARKS + _VALUE_SEPARATOR + (((java.math.BigDecimal) o).toPlainString())
 									+ _STRING_END);
-						} else if (fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase()).getType()
-								.equals(Double.class)) {
+						} else if (o.getClass().equals(java.lang.Double.class)) {
 							json.append(_STRING_MARKS
 									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
 											.getName()
-									+ _STRING_MARKS + _VALUE_SEPARATOR + (((Double) o).doubleValue()) + _STRING_END);
+									+ _STRING_MARKS + _VALUE_SEPARATOR + (((java.lang.Double) o).doubleValue())
+									+ _STRING_END);
+						} else if (o.getClass().equals(java.lang.Integer.class)) {
+							json.append(_STRING_MARKS
+									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
+											.getName()
+									+ _STRING_MARKS + _VALUE_SEPARATOR + (((java.lang.Integer) o).intValue())
+									+ _STRING_END);
+						} else if (o.getClass().equals(java.util.Date.class)) {
+							DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm a z");
+							json.append(_STRING_MARKS
+									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
+											.getName()
+									+ _STRING_MARKS + _VALUE_SEPARATOR + df.format(((java.util.Date) o)) + _STRING_END);
 						} else {
 							json.append(_STRING_MARKS
 									+ fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase())
@@ -73,7 +84,6 @@ public class JSONReponse {
 									+ _STRING_MARKS + _VALUE_SEPARATOR + _OPEN_BRACE + buildJsonString(o) + _CLOSE_BRACE
 									+ _STRING_END);
 						}
-
 					}
 				}
 			} catch (Exception e) {
