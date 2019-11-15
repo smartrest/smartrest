@@ -6,8 +6,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-
+/**
+ * Object to automate the operation
+ * for building a well formatted json
+ * @author davidbertini
+ *
+ */
 public class JSONReponse {
 
 	private final static String _METHOD_PREFIX = "get";
@@ -25,12 +29,17 @@ public class JSONReponse {
 		this.obj = obj;
 	}
 
-	public void getResponse() {
+	/**
+	 * Method to buil the json string start from the 
+	 * object pass in the constructor
+	 * @return
+	 */
+	public String buildResponse() {
 		StringBuilder json = new StringBuilder();
 		json.append(_OPEN_BRACE);
 		json.append(buildJsonString(this.obj));
 		json.append(_CLOSE_BRACE);
-		System.out.println(json.toString());
+		return json.toString();
 	}
 
 	private StringBuilder buildJsonString(Object aObject) {
@@ -40,11 +49,6 @@ public class JSONReponse {
 		Arrays.asList(aObject.getClass().getDeclaredFields()).forEach(f -> {
 			fieldsMap.put(f.getName().toUpperCase(), f);
 		});
-
-//		for (Iterator<String> iterator = fieldsMap.keySet().iterator(); iterator.hasNext();) {
-//			String type = iterator.next();
-//			System.out.println(type);
-//		}
 
 		/// for every object method
 		for (Method m : aObject.getClass().getMethods()) {
@@ -57,53 +61,61 @@ public class JSONReponse {
 					if (o != null) {
 						appendInit(json,
 								fieldsMap.get(m.getName().replaceFirst(_METHOD_PREFIX, "").toUpperCase()).getName());
-						
-						if(!writeBasicTypeData(json,o)) {
+
+						//Check and eventually write to the buffer
+						//the basic known type of object
+						if (!writeBasicTypeData(json, o)) {
+							//If is not aa know basic type 
+							//it be check from other composed types
 							// Arrays of know types
 							if (o instanceof java.lang.Object[]) {
 								json.append(_OPEN_BRACKETS);
 								boolean found = false;
 								for (int i = 0; i < ((java.lang.Object[]) o).length; i++) {
 									if (((java.lang.Object[]) o)[i] != null) {
-										found = writeBasicTypeData(json,((java.lang.Object[]) o)[i]);
-										if (i + 1 < ((java.lang.Object[]) o).length&&found)
+										found = writeBasicTypeData(json, ((java.lang.Object[]) o)[i]);
+										if (i + 1 < ((java.lang.Object[]) o).length && found)
 											json.append(_STRING_END);
 									}
-								}  
-								if(!found) {
+								}
+								if (!found) {
 									for (int i = 0; i < ((java.lang.Object[]) o).length; i++) {
 										if (((java.lang.Object[]) o)[i] != null) {
-											json.append(_OPEN_BRACE).append(buildJsonString(((java.lang.Object[]) o)[i])).append(_CLOSE_BRACE);
+											json.append(_OPEN_BRACE)
+													.append(buildJsonString(((java.lang.Object[]) o)[i]))
+													.append(_CLOSE_BRACE);
 											if (i + 1 < ((java.lang.Object[]) o).length)
 												json.append(_STRING_END);
 										}
 									}
 								}
-								
+
 								json.append(_CLOSE_BRACKETS);
 							} else if (o instanceof java.util.List) {
-								
+
 								json.append(_OPEN_BRACKETS);
 								boolean found = false;
 								for (int i = 0; i < ((java.util.List) o).size(); i++) {
-									if ( ((java.util.List) o).get(i) != null) {
-										found = writeBasicTypeData(json,((java.util.List) o).get(i));
-										if (i + 1 < ((java.util.List) o).size()&&found)
+									if (((java.util.List) o).get(i) != null) {
+										found = writeBasicTypeData(json, ((java.util.List) o).get(i));
+										if (i + 1 < ((java.util.List) o).size() && found)
 											json.append(_STRING_END);
 									}
-								}  
-								if(!found) {
+								}
+								if (!found) {
 									for (int i = 0; i < ((java.util.List) o).size(); i++) {
 										if (((java.util.List) o).get(i) != null) {
-											json.append(_OPEN_BRACE).append(buildJsonString(((java.util.List) o).get(i))).append(_CLOSE_BRACE);
+											json.append(_OPEN_BRACE)
+													.append(buildJsonString(((java.util.List) o).get(i)))
+													.append(_CLOSE_BRACE);
 											if (i + 1 < ((java.util.List) o).size())
 												json.append(_STRING_END);
 										}
 									}
 								}
-								
+
 								json.append(_CLOSE_BRACKETS);
-								
+
 							}
 							// other object
 							else {
@@ -121,63 +133,83 @@ public class JSONReponse {
 		return json.replace(json.lastIndexOf(_STRING_END), json.lastIndexOf(_STRING_END) + 1, "");
 	}
 
-	private synchronized void appendInit(StringBuilder buffer, String aName) {
+	/**
+	 * Method to attach the init of every json parameter
+	 * @param buffer
+	 * @param aName
+	 */
+	private void appendInit(StringBuilder buffer, String aName) {
 		buffer.append(_STRING_MARKS + aName + _STRING_MARKS + _VALUE_SEPARATOR);
 	}
 
-	private synchronized void appendEnd(StringBuilder buffer) {
+	/**
+	 * Method to attach the end of every json value
+	 * @param buffer
+	 */
+	private void appendEnd(StringBuilder buffer) {
 		buffer.append(_STRING_END);
 	}
 
-	private synchronized void writeStringData(StringBuilder json, String data) {
+	/**
+	 * Method to format in well-formatted mode the generic String value
+	 * @param json
+	 * @param data
+	 */
+	private void writeStringData(StringBuilder json, String data) {
 		json.append(_STRING_MARKS + data + _STRING_MARKS);
 	}
 
-	private synchronized void writeCharData(StringBuilder json, Character data) {
+	/**
+	 * Method to format in well-formatted mode the generic Char value
+	 * @param json
+	 * @param data
+	 */
+	private void writeCharData(StringBuilder json, Character data) {
 		json.append(_STRING_MARKS + data.toString() + _STRING_MARKS);
 	}
 
-	private synchronized void writeDateData(StringBuilder json, java.util.Date data) {
+	/**
+	 * Method to format in well-formatted mode the java.util.Date parameter using conventional format
+	 * "yyyy-MM-dd HH:mm a z"
+	 * @param json
+	 * @param data
+	 */
+	private void writeDateData(StringBuilder json, java.util.Date data) {
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm a z");
 		writeStringData(json, df.format((data)));
 	}
-	
-	private synchronized boolean writeBasicTypeData(StringBuilder json, java.lang.Object o) {
-		boolean found=false;
+
+	private boolean writeBasicTypeData(StringBuilder json, java.lang.Object o) {
+		boolean found = false;
 		if (o instanceof java.lang.String) {
 			writeStringData(json, o.toString());
-			found=true;
+			found = true;
 		} else if (o instanceof java.math.BigDecimal) {
 			json.append((((java.math.BigDecimal) o).toPlainString()));
-			found=true;
+			found = true;
 		} else if (o instanceof java.lang.Double) {
 			json.append((((java.lang.Double) o).doubleValue()));
-			found=true;
+			found = true;
 		} else if (o instanceof java.lang.Integer) {
 			json.append((((java.lang.Integer) o).intValue()));
-			found=true;
+			found = true;
 		} else if (o instanceof java.util.Date) {
 			writeDateData(json, (java.util.Date) o);
-			found=true;
+			found = true;
 		} else if (o instanceof java.lang.Character) {
 			writeCharData(json, (((java.lang.Character) o).charValue()));
-			found=true;
+			found = true;
 		} else if (o instanceof java.lang.Boolean) {
 			json.append((((java.lang.Boolean) o).toString()));
-			found=true;
+			found = true;
 		} else if (o instanceof java.lang.Float) {
 			json.append((((java.lang.Float) o).floatValue()));
-			found=true;
+			found = true;
 		} else if (o instanceof java.lang.Long) {
 			json.append((((java.lang.Long) o).floatValue()));
-			found=true;
+			found = true;
 		}
 		return found;
 	}
-	
-	
-	
-	
-	
-	
+
 }

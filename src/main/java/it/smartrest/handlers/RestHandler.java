@@ -17,9 +17,12 @@ import it.smartrest.annotations.GET;
 import it.smartrest.annotations.NotNull;
 import it.smartrest.annotations.POST;
 import it.smartrest.annotations.PUT;
+import it.smartrest.annotations.Path;
+import it.smartrest.annotations.PathParam;
 import it.smartrest.annotations.Query;
 import it.smartrest.core.HttpStatus;
 import it.smartrest.core.ResponseBuilder;
+import it.smartrest.responses.JSONReponse;
 import it.smartrest.utils.URLUtils;
 
 public class RestHandler implements HttpHandler {
@@ -32,6 +35,18 @@ public class RestHandler implements HttpHandler {
 		callParameterMap.putAll(URLUtils.findParameters(exchange.getRequestBody().readAllBytes()));
 		// getting parameter from url after the "?" char
 		callParameterMap.putAll(URLUtils.findParameters(exchange.getRequestURI().getQuery()));
+		
+//		for (Method m : this.getClass().getMethods()) {
+//			if (m.isAnnotationPresent(Path.class)) {
+//				String paths[] = m.getAnnotation(Path.class).value().split("/");
+//				String par[] = exchange.getRequestURI().getPath().split("/");
+//				for (int i = 0; i < paths.length; i++) {
+//					if(paths[i].contains("{") && paths[i].contains("}")) {
+//						callParameterMap.put(paths[i].replaceAll("\\{", "").replaceAll("\\}", ""), par[i+1]);
+//					}
+//				}
+//			}
+//		}
 
 		boolean methodFound = false;
 		// Looping all the method of invoked class to find know annotated method
@@ -43,10 +58,26 @@ public class RestHandler implements HttpHandler {
 					|| (m.isAnnotationPresent(PUT.class)
 							&& exchange.getRequestMethod().equalsIgnoreCase(PUT.class.getSimpleName()))) {
 				try {
+					
+					if (m.isAnnotationPresent(Path.class)) {
+						String paths[] = m.getAnnotation(Path.class).value().split("/");
+						String par[] = exchange.getRequestURI().getPath().split("/");
+						for (int i = 0; i < paths.length; i++) {
+							if(paths[i].contains("{") && paths[i].contains("}")) {
+								callParameterMap.put(paths[i].replaceAll("\\{", "").replaceAll("\\}", ""), par[i+1]);
+							}
+						}
+					}
+					
+					
 					//Getting the parameter list of the method
 					Object[] para = buildParameterFromAnnotation(m.getParameterAnnotations(), callParameterMap);
-					ResponseBuilder.ok(m.invoke(this.getClass().getDeclaredConstructor().newInstance(), para).toString(),
-							exchange);
+					
+					Object response = m.invoke(this.getClass().getDeclaredConstructor().newInstance(), para);
+					if(response instanceof JSONReponse)
+						ResponseBuilder.okJSON((JSONReponse)response, exchange);
+					else
+						ResponseBuilder.ok(response.toString(), exchange);
 					//founded method
 					methodFound = true;
 				} catch (IllegalAccessException | InvocationTargetException | InstantiationException
@@ -123,6 +154,15 @@ public class RestHandler implements HttpHandler {
 				if (a.annotationType().equals(Body.class)) {
 					if (aUrlParameter.containsKey(((Body) a).value())) {
 						Object p[] = { ((Body) a).value(), aUrlParameter.get(((Body) a).value()) };
+						orderedParams.add(p);
+						found = true;
+					}
+				}
+				
+				// Check if present PathParam parameter
+				if (a.annotationType().equals(PathParam.class)) {
+					if (aUrlParameter.containsKey(((PathParam) a).value())) {
+						Object p[] = { ((PathParam) a).value(), aUrlParameter.get(((PathParam) a).value()) };
 						orderedParams.add(p);
 						found = true;
 					}

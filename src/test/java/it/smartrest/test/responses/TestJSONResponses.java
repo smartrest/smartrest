@@ -63,6 +63,6 @@ public class TestJSONResponses {
 		o.setLovedCity(lovedCity);
 		
 		JSONReponse r = new JSONReponse(o);
-		r.getResponse();
+		r.buildResponse();
 	}
 }
