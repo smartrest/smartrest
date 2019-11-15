@@ -42,17 +42,12 @@ public class RestHandler implements HttpHandler {
 		// getting parameter from url after the "?" char
 		callParameterMap.putAll(URLUtils.findParameters(exchange.getRequestURI().getQuery()));
 		
-//		for (Method m : this.getClass().getMethods()) {
-//			if (m.isAnnotationPresent(Path.class)) {
-//				String paths[] = m.getAnnotation(Path.class).value().split("/");
-//				String par[] = exchange.getRequestURI().getPath().split("/");
-//				for (int i = 0; i < paths.length; i++) {
-//					if(paths[i].contains("{") && paths[i].contains("}")) {
-//						callParameterMap.put(paths[i].replaceAll("\\{", "").replaceAll("\\}", ""), par[i+1]);
-//					}
-//				}
-//			}
-//		}
+		
+		checkAnnotationDuplication();
+		
+		
+		
+		
 
 		boolean methodFound = false;
 		// Looping all the method of invoked class to find know annotated method
@@ -104,6 +99,35 @@ public class RestHandler implements HttpHandler {
 			ResponseBuilder.notImplementedMethod("Method " + exchange.getRequestMethod() + " not implemented", exchange,
 					getImplementedMethod().toString());
 
+	}
+
+	private void checkAnnotationDuplication() throws IOException {
+		boolean post = false;
+		boolean get = false;
+		boolean put = false;
+
+		for (Method m : this.getClass().getMethods()) {
+			if (m.isAnnotationPresent(POST.class)) {
+				if(post)
+					throw new IOException("Duplicate Annotation POST");
+				
+				post = true;
+			}
+
+			if (m.isAnnotationPresent(GET.class)) {
+				if(get)
+					throw new IOException("Duplicate Annotation GET");
+
+				get = true;
+			}
+
+			if (m.isAnnotationPresent(PUT.class)) {
+				if(put)
+					throw new IOException("Duplicate Annotation PUT");
+
+				put = true;
+			}
+		}
 	}
 
 	/**
