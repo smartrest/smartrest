@@ -1,6 +1,7 @@
 package it.smartrest.test.services;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,7 +23,7 @@ public class TestService extends RestHandler {
 
 	@GET
 	@Path("rest/{idUtente}/{codFiscale}")
-	public String method(@PathParam("idUtente") String idUtente,
+	public String method(@PathParam("idUtente") BigInteger idUtente,
 						 @PathParam("codFiscale") String codFiscale) {
 		return "Invocato il metodo 1 con idUtente: " + idUtente + " " + codFiscale;
 	}
@@ -43,7 +44,7 @@ public class TestService extends RestHandler {
 	}
 	
 	@PUT
-	public JSONReponse method3(@Query("id") BigDecimal id) {
+	public JSONReponse method3(@Query("id") BigDecimal id,@Query("datanascita") Date datanascita) {
 		TestObject o = new TestObject();
 		o.setCognome("Bertini");
 		o.setNome("David");
@@ -70,7 +71,7 @@ public class TestService extends RestHandler {
 		o.setLuogoNascita(firenze);
 		o.setPeso(new Double(123.4));
 		o.setPrimitiva(10);
-		o.setDataNascita(new Date());
+		o.setDataNascita(datanascita);
 		o.setPadre(false);
 		
 		String interessi[]= {"football","tecnology"};
